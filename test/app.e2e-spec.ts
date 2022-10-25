@@ -1,24 +1,34 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
-import { Test } from '@nestjs/testing';
-import { AppModule } from '../src/app.module';
+import { Test, TestingModule } from '@nestjs/testing';
+// import { INestApplication, ValidationPipe } from '@nestjs/common';
+import * as pactum from 'pactum';
+import { AppModule } from './../src/app.module';
+import { PrismaService } from './../src/prisma/prisma.service';
 
-describe('App e2e', () => {
+describe('AppController (e2e)', () => {
   let app: INestApplication;
+  let prisma: PrismaService;
+
   beforeAll(async () => {
-    const moduleRef = await Test.createTestingModule({
+    const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
     }).compile();
 
-    app = moduleRef.createNestApplication();
+    app = moduleFixture.createNestApplication();
     app.useGlobalPipes(
       new ValidationPipe({
         whitelist: true,
       }),
     );
+
     await app.init();
+
+    prisma = app.get(PrismaService);
+    await prisma.cleanDb();
   });
   afterAll(() => {
     app.close();
   });
+
   it.todo('should pass');
 });
