@@ -3,6 +3,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 // import { INestApplication, ValidationPipe } from '@nestjs/common';
 import * as pactum from 'pactum';
 import { AuthDto } from 'src/auth/dto';
+import { editUserDto } from 'src/user/dto';
 import { AppModule } from './../src/app.module';
 import { PrismaService } from './../src/prisma/prisma.service';
 
@@ -119,7 +120,24 @@ describe('AppController (e2e)', () => {
       });
     });
 
-    describe('Edit user', () => {});
+    describe('Edit user', () => {
+      it('Should edit user', () => {
+        const dto: editUserDto = {
+          firstName: 'Calvinpark',
+          email: 'asdf@gmail.com',
+        };
+        return pactum
+          .spec()
+          .patch('/user')
+          .withHeaders({
+            Authorization: `Bearer $S{userAt}`,
+          })
+          .withBody(dto)
+          .expectStatus(200)
+          .expectBodyContains(dto.firstName)
+          .expectBodyContains(dto.email);
+      });
+    });
   });
 
   describe('Bookmarks', () => {
