@@ -79,28 +79,55 @@ describe('AppController (e2e)', () => {
     });
 
     describe('Signin', () => {
-      it('should Signin', () => {
+      it('should throw error if email is not proper', () => {
         return pactum
           .spec()
           .post('/auth/Signin')
+          .withBody({
+            email: 'alskjdhf',
+          })
+          .expectStatus(400)
+          .inspect();
+      });
+
+      it('should throw error if email and password are not provided', () => {
+        return pactum.spec().post('/auth/signin').expectStatus(400);
+      });
+
+      it('should Signin', () => {
+        return pactum
+          .spec()
+          .post('/auth/signin')
           .withBody(dto)
-          .expectStatus(200);
+          .expectStatus(200)
+          .stores('userAt', 'access_token');
       });
     });
   });
 
   describe('User', () => {
-    describe('Get me', () => {});
+    describe('Get me', () => {
+      it('should get current user', () => {
+        return pactum
+          .spec()
+          .get('/user/me')
+          .withHeaders({
+            Authorization: `Bearer $S{userAt}`,
+          })
+          .expectStatus(200)
+          .inspect();
+      });
+    });
 
     describe('Edit user', () => {});
   });
 
   describe('Bookmarks', () => {
-    describe('Create Bookmark', () => {});
+    describe('Create Bookmark by ID', () => {});
 
-    describe('Get bookmarks', () => {});
+    describe('Get bookmarks by ID', () => {});
 
-    describe('Edit bookmark', () => {});
+    describe('Edit bookmark by ID', () => {});
 
     describe('Delete book', () => {});
   });
